@@ -1,4 +1,5 @@
 const { Profile } = require('../models');
+const { signToken } = require('../utils/auth')
 
 const resolvers = {
   Query: {
@@ -12,8 +13,10 @@ const resolvers = {
   },
 
   Mutation: {
-    addProfile: async (parent, { name }) => {
-      return Profile.create({ name });
+    addProfile: async (parent, { name, email, password }) => {
+      const profile = await Profile.create({ name, email, password })
+      const token = signToken(profile)
+      return { token, profile };
     },
     addSkill: async (parent, { profileId, skill }) => {
       return Profile.findOneAndUpdate(
